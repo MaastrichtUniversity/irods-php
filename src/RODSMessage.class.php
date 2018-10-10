@@ -57,7 +57,7 @@ class RODSMessage
         $this->header = new RP_MsgHeader($this->typestr, strlen($this->msg_xml),
             strlen($this->errstr), strlen($this->binstr), $this->intinfo);
         $header_xml = $this->header->toXML();
-        debug(10, "message pack xml header $header_xml\n  message $this->msg_xml");
+        debug(10, "RODSMessage pack xml header $header_xml\n  message $this->msg_xml");
         $this->serialized = pack("N", strlen($header_xml)) . $header_xml .
             $this->msg_xml;
         return $this->serialized;
@@ -86,7 +86,7 @@ class RODSMessage
         // get main msg string
         $msg_len = $this->header->msgLen;
         $this->msg_xml = stream_get_contents($conn, $msg_len);
-        debug(10, "message unpack xml header $this->header_xml\n   message $this->msg_xml");
+        debug(10, "RODSMessage unpack xml header $this->header_xml\n   message $this->msg_xml");
         if ($msg_len != strlen($this->msg_xml)) {
             throw new RODSException("RODSMessage::unpack failed.2! " .
                     "The body length is unexpected: " . strlen($this->msg_xml) .
@@ -176,6 +176,10 @@ class RODSMessage
     public static function packConnectMsg($user, $proxy_user, $zone, $relVersion = RODS_REL_VERSION,
                                           $apiVersion = RODS_API_VERSION, $option = NULL)
     {
+        if (array_key_exists('client', $GLOBALS['PRODS_CONFIG']) &&
+            array_key_exists('server_negotiation', $GLOBALS['PRODS_CONFIG']['client'])) {
+            $option .= $GLOBALS['PRODS_CONFIG']['client']['server_negotiation'];
+        }
         $msgbody = new RP_StartupPack($user, $proxy_user, $zone, $relVersion, $apiVersion, $option);
         $rods_msg = new RODSMessage("RODS_CONNECT_T", $msgbody);
         return $rods_msg->pack();
