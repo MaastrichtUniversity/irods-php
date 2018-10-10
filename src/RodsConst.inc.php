@@ -5,7 +5,7 @@
 define ("ORDER_BY", 0x400);
 define ("ORDER_BY_DESC", 0x800);
 
-define("RODS_REL_VERSION", 'rods1.1');
+define("RODS_REL_VERSION", 'rods4.2.3');
 define("RODS_API_VERSION", 'd');
 
 /**#@-*/
