@@ -90,7 +90,8 @@ class RODSConn {
 
         // if we're going to use PAM, set up the socket context
         // options for SSL connections when we open the connection
-        if (1) {
+        $is_pam = strcasecmp($auth_type, "PAM") == 0;
+        if ($is_pam) {
             debug(10, "using ssl: for auth_type $auth_type");
             $ssl_opts = array('ssl' => array());
             if (array_key_exists('ssl', $GLOBALS['PRODS_CONFIG'])) {
@@ -134,7 +135,7 @@ class RODSConn {
         }
 
         // are we doing PAM authentication
-        if (1) {
+        if ($is_pam) {
             debug(10, "using ssl: asking server: for auth_type $auth_type");
             // Ask server to turn on SSL
             $req_packet = new RP_sslStartInp();
@@ -143,7 +144,8 @@ class RODSConn {
             $msg = new RODSMessage();
             $intInfo = $msg->unpack($conn);
             if ($intInfo < 0) {
-                throw new RODSException("Connection to '$host:$port' failed.ssl1. User: $proxy_user Zone: $zone", $GLOBALS['PRODS_ERR_CODES_REV']["$intInfo"]);
+                throw new RODSException("Connection to '$host:$port' failed.ssl1. User: $proxy_user Zone: $zone",
+                                        $GLOBALS['PRODS_ERR_CODES_REV']["$intInfo"]);
             }
             // Turn on SSL on our side
             // TSM Feb 2016: changed crypto method from TLS_CLIENT to SSLv23_CLIENT  because iRODS4.1 expects at least TLS1.2
