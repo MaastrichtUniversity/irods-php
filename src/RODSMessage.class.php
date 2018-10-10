@@ -57,6 +57,7 @@ class RODSMessage
         $this->header = new RP_MsgHeader($this->typestr, strlen($this->msg_xml),
             strlen($this->errstr), strlen($this->binstr), $this->intinfo);
         $header_xml = $this->header->toXML();
+        debug(10, "message pack xml header $header_xml\n  message $this->msg_xml");
         $this->serialized = pack("N", strlen($header_xml)) . $header_xml .
             $this->msg_xml;
         return $this->serialized;
@@ -85,6 +86,7 @@ class RODSMessage
         // get main msg string
         $msg_len = $this->header->msgLen;
         $this->msg_xml = stream_get_contents($conn, $msg_len);
+        debug(10, "message unpack xml header $this->header_xml\n   message $this->msg_xml");
         if ($msg_len != strlen($this->msg_xml)) {
             throw new RODSException("RODSMessage::unpack failed.2! " .
                     "The body length is unexpected: " . strlen($this->msg_xml) .

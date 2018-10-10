@@ -22,7 +22,7 @@ if (!defined("O_TRUNC"))
 class RODSConn {
 
     private $conn;     // (resource) socket connection to RODS server
-    private $account;  // RODS user account  
+    private $account;  // RODS user account
     private $idle;
     private $id;
     public $connected;
@@ -88,12 +88,14 @@ class RODSConn {
         $zone = $this->account->zone;
         $auth_type = $this->account->auth_type;
 
-        // if we're going to use PAM, set up the socket context 
+        // if we're going to use PAM, set up the socket context
         // options for SSL connections when we open the connection
-        if (strcasecmp($auth_type, "PAM") == 0) {
+        if (1) {
+            debug(10, "using ssl: for auth_type $auth_type");
             $ssl_opts = array('ssl' => array());
             if (array_key_exists('ssl', $GLOBALS['PRODS_CONFIG'])) {
                 $ssl_conf = $GLOBALS['PRODS_CONFIG']['ssl'];
+                debug(10, "using ssl: has ssl config ", $ssl_conf);
                 if (array_key_exists('verify_peer', $ssl_conf)) {
                     if (strcasecmp("true", $ssl_conf['verify_peer']) == 0) {
                         $ssl_opts['ssl']['verify_peer'] = true;
@@ -132,7 +134,8 @@ class RODSConn {
         }
 
         // are we doing PAM authentication
-        if (strcasecmp($auth_type, "PAM") == 0) {
+        if (1) {
+            debug(10, "using ssl: asking server: for auth_type $auth_type");
             // Ask server to turn on SSL
             $req_packet = new RP_sslStartInp();
             $msg = new RODSMessage("RODS_API_REQ_T", $req_packet, $GLOBALS['PRODS_API_NUMS']['SSL_START_AN']);
@@ -146,7 +149,7 @@ class RODSConn {
             // TSM Feb 2016: changed crypto method from TLS_CLIENT to SSLv23_CLIENT  because iRODS4.1 expects at least TLS1.2
             //               in PHP 5.4 the TLS_CLIENT will NOT negotiate TLS 1.2 where SSLv23 does so.
             //               see https://bugs.php.net/bug.php?id=65329
- 
+
             if (!stream_socket_enable_crypto($conn, true, STREAM_CRYPTO_METHOD_SSLv23_CLIENT)) {
                 throw new RODSException("Error turning on SSL on connection to server '$host:$port'.");
             }
@@ -154,7 +157,7 @@ class RODSConn {
             // all good ... do the PAM authentication over the encrypted connection
             // FIXME: '24', the TTL in hours, should be a configuration option.
             $req_packet = new RP_pamAuthRequestInp($proxy_user, $pass, 24);
-            
+
             $msg = new RODSMessage("RODS_API_REQ_T", $req_packet, $GLOBALS['PRODS_API_NUMS']['PAM_AUTH_REQUEST_AN']);
             fwrite($conn, $msg->pack());
             $msg = new RODSMessage();
