@@ -6,9 +6,9 @@
  * @copyright Copyright &copy; 2007, TBD
  * @package RODSConn
  */
-require_once("RodsAPINum.inc.php");
-require_once("RodsErrorTable.inc.php");
-require_once("RodsConst.inc.php");
+require_once(dirname(__FILE__) . "/../RodsAPINum.inc.php");
+require_once(dirname(__FILE__) . "/../RodsErrorTable.inc.php");
+require_once(dirname(__FILE__) . "/../RodsConst.inc.php");
 
 if (!defined("O_RDONLY"))
     define("O_RDONLY", 0);
@@ -874,8 +874,8 @@ class RODSConn {
      * @return number of bytes written if success, in case of faliure, throw an exception
      */
     public function repl($path_src, $desc_resc, array $options = array()) {
-        require_once(dirname(__FILE__) . "/RODSObjIOOpr.inc.php");
-        require_once(dirname(__FILE__) . "/RodsGenQueryKeyWd.inc.php");
+        require_once(dirname(__FILE__) . "/../RODSObjIOOpr.inc.php");
+        require_once(dirname(__FILE__) . "/../RodsGenQueryKeyWd.inc.php");
 
         $optype = REPLICATE_OPR;
 
@@ -933,7 +933,7 @@ class RODSConn {
      * @return true/false
      */
     public function rename($path_src, $path_dest, $path_type) {
-        require_once(dirname(__FILE__) . "/RODSObjIOOpr.inc.php");
+        require_once(dirname(__FILE__) . "/../RODSObjIOOpr.inc.php");
 
         if ($path_type === 0) {
             $path_type_magic_num = RENAME_DATA_OBJ;
@@ -1431,8 +1431,8 @@ class RODSConn {
             $GenQueInp_options = 1;
         }
 
-        require_once("RodsGenQueryNum.inc.php"); //load magic numbers
-        require_once("RodsGenQueryKeyWd.inc.php"); //load magic numbers
+        require_once(dirname(__FILE__) . "/../RodsGenQueryNum.inc.php"); //load magic numbers
+        require_once(dirname(__FILE__) . "/../RodsGenQueryKeyWd.inc.php"); //load magic numbers
         // contruct select packet (RP_InxIvalPair $selectInp)
         $select_pk = NULL;
         if (count($select) > 0) {
