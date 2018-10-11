@@ -9,7 +9,19 @@
 require_once("RC_base.class.php");
 require_once("RC_connect.class.php");
 
-/* The default RODSConn class for basic non-ssl irods authtype and PAM */
-class RODSConn {
-    use RC_base, RC_connect;
+function getRodsConn(RODSAccount $account) {
+    $connname = "RODSConn" . ucfirst($account->auth_type);
+    $conn = new $connname($account);
+    debug(5, "Created $connname instance for account ", $account);
+    return $conn;
+}
+
+/* The default RODSConn class for basic non-ssl irods authtype */
+class RODSConnIrods {
+    use RC_base, RC_connect_Irods;
+}
+
+/* The default RODSConn class for basic non-ssl PAM authtype (PAM auth step only is SSL) */
+class RODSConnPAM {
+    use RC_base, RC_connect_PAM;
 }

@@ -9,6 +9,7 @@
 define("MAX_NUM_CONN_PER_USER_SERVER", 5);
 /**#@-*/
 
+require_once('connection/RODSConn.class.php');
 
 if (!isset($GLOBALS['RODSConnManager']))
     $GLOBALS['RODSConnManager'] = new RODSConnManager();
@@ -34,7 +35,7 @@ class RODSConnManager
     {
         $manager = $GLOBALS['RODSConnManager'];
 
-        $conn = new RODSConn($account);
+        $conn = getRODSConn($account);
         $conn_sig = $conn->getSignature();
         if (!isset($manager->conn_map[$conn_sig]))
             $manager->conn_map[$conn_sig] = array();
