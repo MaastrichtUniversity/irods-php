@@ -134,6 +134,13 @@ class RODSConn {
             throw new RODSException("Connection to '$host:$port' failed.2. User: $proxy_user Zone: $zone", $GLOBALS['PRODS_ERR_CODES_REV']["$intInfo"]);
         }
 
+        if ($msg->getHeaderType() == 'RODS_CS_NEG_T') {
+            debug(10, "RODSConn got connection negotiation request ", $msg);
+            $serverneg = $msg->getBody()->result;
+            if ($neg == 'CS_NEG_REQUIRE') {
+            };
+        };
+
         // are we doing PAM authentication
         if ($is_pam) {
             debug(10, "using ssl: asking server: for auth_type $auth_type");

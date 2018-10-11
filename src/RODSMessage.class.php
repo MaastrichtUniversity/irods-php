@@ -6,7 +6,8 @@ $GLOBALS['RODSMessage_types'] = array(
     "RODS_API_REQ_T" => "RODS_API_REQ",
     "RODS_DISCONNECT_T" => "RODS_DISCONNECT",
     "RODS_REAUTH_T" => "RODS_REAUTH",
-    "RODS_API_REPLY_T" => "RODS_API_REPLY"
+    "RODS_API_REPLY_T" => "RODS_API_REPLY",
+    "RODS_CS_NEG_T" => "RODS_CS_NEG",
 );
 
 class RODSMessage
@@ -173,12 +174,19 @@ class RODSMessage
         return $this->header_xml . "\n" . $this->msg_xml;
     }
 
+    public function getHeaderType()
+    {
+        return $this->header->type;
+    }
+
     public static function packConnectMsg($user, $proxy_user, $zone, $relVersion = RODS_REL_VERSION,
                                           $apiVersion = RODS_API_VERSION, $option = NULL)
     {
         if (array_key_exists('client', $GLOBALS['PRODS_CONFIG']) &&
             array_key_exists('server_negotiation', $GLOBALS['PRODS_CONFIG']['client'])) {
-            $option .= $GLOBALS['PRODS_CONFIG']['client']['server_negotiation'];
+            $neg = $GLOBALS['PRODS_CONFIG']['client']['server_negotiation'];
+            debug(8, "packConnectMsg added client server negotiation option $neg");
+            $option .= $neg;
         }
         $msgbody = new RP_StartupPack($user, $proxy_user, $zone, $relVersion, $apiVersion, $option);
         $rods_msg = new RODSMessage("RODS_CONNECT_T", $msgbody);

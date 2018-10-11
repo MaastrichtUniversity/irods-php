@@ -125,6 +125,8 @@ class RODSPacket
         if (!isset($this->packlets))
             return;
 
+        debug(10, get_class($this), " fromSXE packlets ", $this->packlets, " sxe ", $sxe);
+
         foreach ($this->packlets as $packlet_key => &$packlet_val) {
             if ($packlet_val instanceof RODSPacket) //if expecting sub packet
             {
