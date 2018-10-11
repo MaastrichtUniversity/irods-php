@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../../prods/src/RODSException.class.php';
+require_once dirname(__FILE__) . '/../../src/RODSException.class.php';
 
 /**
  * Test class for RODSException.

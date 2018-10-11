@@ -9,14 +9,14 @@
  *
  * @author lisa
  */
-require_once dirname(__FILE__) . '/../../../prods/src/RODSConnManager.class.php';
-require_once dirname(__FILE__) . '/../../../prods/src/RODSAccount.class.php';
-require_once dirname(__FILE__) . '/../../../prods/src/RODSConn.class.php';
-require_once dirname(__FILE__) . '/../../../prods/src/RODSDirStats.class.php';
-require_once dirname(__FILE__) . '/../../../prods/src/RODSGenQueConds.class.php';
-require_once dirname(__FILE__) . '/../../../prods/src/RODSGenQueSelFlds.class.php';
-require_once dirname(__FILE__) . '/../../../prods/src/RODSGenQueResults.class.php';
-require_once dirname(__FILE__) . '/../../../prods/src/RODSException.class.php';
+require_once dirname(__FILE__) . '/../../../src/RODSConnManager.class.php';
+require_once dirname(__FILE__) . '/../../../src/RODSAccount.class.php';
+require_once dirname(__FILE__) . '/../../../src/connection/RODSConn.class.php';
+require_once dirname(__FILE__) . '/../../../src/RODSDirStats.class.php';
+require_once dirname(__FILE__) . '/../../../src/RODSGenQueConds.class.php';
+require_once dirname(__FILE__) . '/../../../src/RODSGenQueSelFlds.class.php';
+require_once dirname(__FILE__) . '/../../../src/RODSGenQueResults.class.php';
+require_once dirname(__FILE__) . '/../../../src/RODSException.class.php';
 
 class stubRODSConn extends RODSConn {
     private $meta_array = array('this is a test of metadata');

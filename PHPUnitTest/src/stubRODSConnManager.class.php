@@ -9,10 +9,10 @@
  *
  * @author lisa
  */
-require_once dirname(__FILE__) . '/../../../prods/src/RODSConnManager.class.php';
-require_once dirname(__FILE__) . '/../../../prods/src/RODSAccount.class.php';
-require_once dirname(__FILE__) . '/../../../prods/src/RODSConn.class.php';
-require_once dirname(__FILE__) . '/stubRODSConn.class.php';
+require_once dirname(__FILE__) . '/../../src/RODSConnManager.class.php';
+require_once dirname(__FILE__) . '/../../src/RODSAccount.class.php';
+require_once dirname(__FILE__) . '/../../src/connection/RODSConn.class.php';
+require_once dirname(__FILE__) . '/connection/stubRODSConn.class.php';
 
 class stubRODSConnManager extends RODSConnManager {
     public function  __construct() {

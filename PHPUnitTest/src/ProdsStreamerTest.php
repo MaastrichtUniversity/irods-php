@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../../prods/src/ProdsStreamer.class.php';
+require_once dirname(__FILE__) . '/../../src/ProdsStreamer.class.php';
 
 /**
  * Test class for ProdsStreamer.
