@@ -30,6 +30,8 @@ trait RC_base {
     private $account;  // RODS user account
     private $idle;
     private $id;
+    private $ssl;
+    private $ssl_enabled;
     public $connected;
 
     /**
@@ -45,6 +47,8 @@ trait RC_base {
         $this->connected = false;
         $this->conn = NULL;
         $this->idle = true;
+        $this->ssl = NULL;
+        $this->ssl_enabled = false;
     }
 
     public function __destruct() {

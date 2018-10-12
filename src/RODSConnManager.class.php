@@ -60,12 +60,12 @@ class RODSConnManager
             return $conn;
         }
 
-        //because PHP doesn't support multithread, if we run out of connections,
-        //there is probably something went wrong.
+        // because PHP doesn't support multithread, if we run out of connections,
+        // there is probably something went wrong.
         throw new RODSException("Unexpectedly ran out of connections. Maybe some connections are not released??? ",
             "PERR_INTERNAL_ERR");
 
-        //if no connection are available, sleep for 100ms and retry
+        // if no connection are available, sleep for 100ms and retry
         usleep(100);
         echo "i am sleeping... <br/> \n";
         return RODSConnManager::getConn($account);

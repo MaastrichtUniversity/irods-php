@@ -16,12 +16,16 @@ function getRodsConn(RODSAccount $account) {
     return $conn;
 }
 
+class RODSConn {
+    use RC_base, RC_connect;
+};
+
 /* The default RODSConn class for basic non-ssl irods authtype */
-class RODSConnIrods {
-    use RC_base, RC_connect_Irods;
+class RODSConnIrods extends RODSConn {
+    use RC_connect_Irods;
 }
 
 /* The default RODSConn class for basic non-ssl PAM authtype (PAM auth step only is SSL) */
-class RODSConnPAM {
-    use RC_base, RC_connect_PAM;
+class RODSConnPAM extends RODSConn {
+    use RC_connect_PAM;
 }
