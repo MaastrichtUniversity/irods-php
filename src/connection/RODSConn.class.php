@@ -18,7 +18,7 @@ function getRodsConn(RODSAccount $account) {
 }
 
 class RODSConn {
-    use RC_base, RC_connect;
+    //use RC_base, RC_connect; // stupid php5.6 and traits vs subclasses
 };
 
 // WARNING: code below copies the traits from parent class,
