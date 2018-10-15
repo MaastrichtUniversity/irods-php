@@ -26,8 +26,8 @@ class RODSConn {
 //   Should be fixed in php7
 
 /* The default RODSConn class for basic non-ssl irods authtype */
-class RODSConnIrods extends RODSConn {
-    use RC_auth_Irods, RC_base, RC_connect;
+class RODSConnNative extends RODSConn {
+    use RC_auth_Native, RC_base, RC_connect;
 }
 
 /* The default RODSConn class for basic non-ssl PAM authtype (PAM auth step only is SSL) */

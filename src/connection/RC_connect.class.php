@@ -426,7 +426,7 @@ trait RC_auth_password {
     }
 }
 
-trait RC_auth_Irods {
+trait RC_auth_Native {
     use RC_auth_password;
 
     private function postConnection() {
