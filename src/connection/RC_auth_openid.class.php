@@ -67,6 +67,11 @@ trait RC_auth_openid {
             debug(10, "Current session is valid");
         } else {
             debug(10, "Got SSO url $url");
+            if (http_response_code()) {
+                // webservice
+            } else {
+                // CLI
+            }
         }
 
         // wait (i.e. read from server) for username message now
