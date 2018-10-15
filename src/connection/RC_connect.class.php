@@ -36,7 +36,8 @@ $GLOBALS['CS_NEGOTIATIONS_TABLE'] = array(
 trait RC_connect {
     // setup the (TCP) connection to the irods server
     //    sets the conn attribute
-    private function makeConnection() {
+    // public: for use in auth_openid
+    public function makeConnection() {
         $host = $this->account->host;
         $port = $this->account->port;
 
@@ -47,6 +48,36 @@ trait RC_connect {
             throw new RODSException("Connection to '$host:$port' failed.1: ($errno)$errstr. ", "SYS_SOCK_OPEN_ERR");
 
         $this->conn = $conn;
+    }
+
+    // public: for use in auth_openid
+    public function writeData ($data, $addlen = false) {
+        $datalen = strlen($data);
+        debug(13, "sendMessage fwrite start: $datalen");
+        if ($addlen) {
+            $written = fwrite($this->conn, pack('i', strlen($data)));
+        }
+        $written = fwrite($this->conn, $data);
+        debug(13, "sendMessage fwrite completed: $written");
+    }
+
+    // public: for use in auth_openid
+    public function readData ($what) {
+        debug(10, "Start to read $what from connection");
+        $size = stream_get_contents($this->conn, 4); // 4 is size of int
+        // unpack returns assoc array
+        //   we have no named format, so the key of the value we are looking for is '1'
+        //   (yes, the above is correct).
+        $sizeu = unpack('i*', $size);
+        if (!array_key_exists(1, $sizeu)) {
+            throw new RODSException("readData: failed to unpack $size in integer");
+        }
+
+        $sizeint = $sizeu[1];
+
+        $data = stream_get_contents($this->conn, $sizeint);
+        debug(10, "Finished reading $what from connection: $data (size $sizeint data len ".strlen($data).")");
+        return $data;
     }
 
     /*
@@ -60,9 +91,7 @@ trait RC_connect {
             $data = $msg->pack();
         };
 
-        debug(13, "sendMessage fwrite start: ", strlen($data));
-        $written = fwrite($this->conn, $data);
-        debug(13, "sendMessage fwrite completed: $written");
+        $this->writeData($data);
 
         if (!$response) {
             debug(10, "No response expected");
@@ -83,6 +112,16 @@ trait RC_connect {
             throw new RODSException("Connection to '$host:$port' failed: $txt", $GLOBALS['PRODS_ERR_CODES_REV']["$intInfo"]);
         }
         return $resp;
+    }
+
+    private function splitKV ($txt) {
+        $res = array();
+        foreach (explode(';', $txt) as $kvtxt) {
+            $kv = explode('=', $kvtxt, 2);
+            $res[$kv[0]] = $kv[1];
+        }
+        debug(10, "split kv text $txt in ", $res);
+        return $res;
     }
 
     /* Handle client server negotiation.
@@ -147,7 +186,7 @@ trait RC_connect {
                     $key_msg = new RODSMessage();
                     $key_msg->setHeader($key, $key_size, 0, 0, 0);
                     $data = $key_msg->pack() . $key;
-                    $this->sendMessage($key_msg, NULL, false, $data);
+                    $this->writeData($data);
 
                     $this->ssl = array(
                         'shared_secret' => $key,
@@ -189,42 +228,6 @@ trait RC_connect {
         }
     }
 
-    private function postConnection() {
-    }
-
-    public function passwordAuth () {
-        $pass = $this->account->pass;
-        $proxy_user = $this->account->proxy_user;
-        $zone = $this->account->zone;
-
-        // request (temporary) password based authentication
-        $msg = new RODSMessage("RODS_API_REQ_T", NULL, $GLOBALS['PRODS_API_NUMS']['AUTH_REQUEST_AN']);
-        $resp = $this->sendMessage($msg, "Authentication challenge request");
-
-        $pack = $resp->getBody();
-        $challenge_b64encoded = $pack->challenge;
-        $challenge = base64_decode($challenge_b64encoded);
-
-        // encode challenge with passwd
-        $pad_pass = str_pad($pass, MAX_PASSWORD_LEN, "\0");
-        $pwmd5 = md5($challenge . $pad_pass, true);
-        for ($i = 0; $i < strlen($pwmd5); $i++) { //"escape" the string in RODS way...
-            if (ord($pwmd5[$i]) == 0) {
-                $pwmd5[$i] = chr(1);
-            }
-        }
-        $response = base64_encode($pwmd5);
-
-        // set response
-        $resp_packet = new RP_authResponseInp($response, $proxy_user);
-        $msg = new RODSMessage("RODS_API_REQ_T", $resp_packet, $GLOBALS['PRODS_API_NUMS']['AUTH_RESPONSE_AN']);
-        $this->sendMessage($msg, function () {
-            $this->disconnect();
-            $scrambledPass = preg_replace("|.|","*", $pass);
-            return "Login failed, possible wrong user/passwd for user: $proxy_user pass: $scrambledPass zone: $zone";
-        });
-    }
-
     private function useTicket () {
         $ticket_packet = new RP_ticketAdminInp('session', $this->account->ticket);
         $msg = new RODSMessage('RODS_API_REQ_T', $ticket_packet, 723);
@@ -242,7 +245,7 @@ trait RC_connect {
 
         $this->postConnection();
 
-        $this->passwordAuth();
+        $this->auth();
 
         $this->connected = true;
 
@@ -255,7 +258,7 @@ trait RC_connect {
     /**
      * Close the connection (socket)
      */
-    public function disconnect($force = false) {
+    public function disconnect($force = false, $message = true) {
         if (($this->connected === false) && ($force !== true))
             return;
 
@@ -265,8 +268,10 @@ trait RC_connect {
             $this->disableSSL();
         }
 
-        $msg = new RODSMessage("RODS_DISCONNECT_T");
-        $this->sendMessage($msg, "RODS disconnect", false);
+        if ($message) {
+            $msg = new RODSMessage("RODS_DISCONNECT_T");
+            $this->sendMessage($msg, "RODS disconnect", false);
+        }
 
         fclose($this->conn);
         $this->connected = false;
@@ -314,6 +319,7 @@ trait RC_connect {
             } elseif (array_key_exists('ca_certificate_path', $ssl_conf)) {
                 // from json environment
                 $ssl_opts['ssl']['capath'] = $ssl_conf['ca_certificate_path'];
+
             }
         }
 
@@ -332,7 +338,8 @@ trait RC_connect {
     }
 
     // Activate SSL on the connection
-    private function enableSSL () {
+    // public: for use in auth_openid
+    public function enableSSL () {
         debug(5, "Enabling SSL");
 
         $this->setSSLContext();
@@ -382,11 +389,53 @@ trait RC_connect {
 
 }
 
+trait RC_auth_password {
+    public function auth () {
+        $pass = $this->account->pass;
+        $proxy_user = $this->account->proxy_user;
+        $zone = $this->account->zone;
 
-trait RC_connect_Irods {
+        // request (temporary) password based authentication
+        $msg = new RODSMessage("RODS_API_REQ_T", NULL, $GLOBALS['PRODS_API_NUMS']['AUTH_REQUEST_AN']);
+        $resp = $this->sendMessage($msg, "Authentication challenge request");
+
+        $pack = $resp->getBody();
+        $challenge_b64encoded = $pack->challenge;
+        $challenge = base64_decode($challenge_b64encoded);
+
+        // encode challenge with passwd
+        $pad_pass = str_pad($pass, MAX_PASSWORD_LEN, "\0");
+        $pwmd5 = md5($challenge . $pad_pass, true);
+        for ($i = 0; $i < strlen($pwmd5); $i++) { //"escape" the string in RODS way...
+            if (ord($pwmd5[$i]) == 0) {
+                $pwmd5[$i] = chr(1);
+            }
+        }
+
+        // base64_encode the bin authResponseInp_PI
+        $response = base64_encode($pwmd5);
+
+        // set response
+        $resp_packet = new RP_authResponseInp($response, $proxy_user);
+        $msg = new RODSMessage("RODS_API_REQ_T", $resp_packet, $GLOBALS['PRODS_API_NUMS']['AUTH_RESPONSE_AN']);
+        $this->sendMessage($msg, function () {
+            $this->disconnect();
+            $scrambledPass = preg_replace("|.|","*", $pass);
+            return "Login failed, possible wrong user/passwd for user: $proxy_user pass: $scrambledPass zone: $zone";
+        });
+    }
 }
 
-trait RC_connect_PAM {
+trait RC_auth_Irods {
+    use RC_auth_password;
+
+    private function postConnection() {
+    }
+}
+
+trait RC_auth_PAM {
+    use RC_auth_password;
+
     private function postConnection(RODSMessage $msg) {
         // Ask server to turn on SSL
         $req_packet = new RP_sslStartInp();
