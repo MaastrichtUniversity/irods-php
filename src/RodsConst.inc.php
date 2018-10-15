@@ -83,7 +83,13 @@ function debug() {
                     ob_end_clean();
                 };
             };
-            print "[DEBUG] ".rtrim($msg)."\n";
+
+            if (function_exists('log_message')) {
+                // CodeIgniter / yoda
+                log_message('debug', $msg);
+            } else {
+                print "[DEBUG] ".rtrim($msg)."\n";
+            }
         }
     };
 }
