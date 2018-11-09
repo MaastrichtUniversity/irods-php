@@ -124,7 +124,7 @@ trait RC_user {
 
         // set selected value
         $select_val = array("COL_USER_ID", "COL_USER_NAME", "COL_USER_TYPE",
-            "COL_USER_ZONE", "COL_USER_DN", "COL_USER_INFO",
+            "COL_USER_ZONE", "COL_USER_INFO",
             "COL_USER_COMMENT", "COL_USER_CREATE_TIME", "COL_USER_MODIFY_TIME");
         $cond = array(new RODSQueryCondition("COL_USER_NAME", $user));
         $que_result = $this->genQuery($select_val, $cond);
@@ -144,11 +144,13 @@ trait RC_user {
             } else {
                 $retval['zone'] = $this->account->zone;
             }
-            $retval['dn'] = $que_result["COL_USER_DN"][0];
             $retval['info'] = $que_result["COL_USER_INFO"][0];
             $retval['comment'] = $que_result["COL_USER_COMMENT"][0];
             $retval['ctime'] = $que_result["COL_USER_CREATE_TIME"][0];
             $retval['mtime'] = $que_result["COL_USER_MODIFY_TIME"][0];
+
+             # DN is not queried, so intentionally left empty (but keep it for backwards compatibility)
+            $retval['dn'] = '';
 
             return $retval;
         }
