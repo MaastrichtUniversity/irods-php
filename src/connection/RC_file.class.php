@@ -248,6 +248,12 @@ trait RC_file {
             $api_num = $GLOBALS['PRODS_API_NUMS']['DATA_OBJ_OPEN_AN'];
         }
 
+        # Don't try to read a file that does not exist.
+        if($file_exists === false && $open_flag == O_RDONLY) {
+                throw new RODSException("trying to open a file '$path' " .
+                "which does not exists with mode '$mode' ", "PERR_USER_INPUT_ERROR");
+        }
+
         $msg = new RODSMessage("RODS_API_REQ_T", $dataObjInp_pk, $api_num);
         fwrite($this->conn, $msg->pack());
 
