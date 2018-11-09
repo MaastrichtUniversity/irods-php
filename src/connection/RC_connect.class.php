@@ -416,11 +416,11 @@ trait RC_auth_password {
         $response = base64_encode($pwmd5);
 
         // set response
-        $resp_packet = new RP_authResponseInp($response, $proxy_user);
+        $resp_packet = new RP_authResponseInp($response, "$proxy_user#$zone");
         $msg = new RODSMessage("RODS_API_REQ_T", $resp_packet, $GLOBALS['PRODS_API_NUMS']['AUTH_RESPONSE_AN']);
         $this->sendMessage($msg, function () {
             $this->disconnect();
-            $scrambledPass = preg_replace("|.|","*", $pass);
+            $scrambledPass = preg_replace("|.|", "*", $pass);
             return "Login failed, possible wrong user/passwd for user: $proxy_user pass: $scrambledPass zone: $zone";
         });
     }
