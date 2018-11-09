@@ -436,7 +436,7 @@ trait RC_auth_Native {
 trait RC_auth_PAM {
     use RC_auth_password;
 
-    private function postConnection(RODSMessage $msg) {
+    private function postConnection() {
         // Ask server to turn on SSL
         $req_packet = new RP_sslStartInp();
         $msg = new RODSMessage("RODS_API_REQ_T", $req_packet, $GLOBALS['PRODS_API_NUMS']['SSL_START_AN']);
