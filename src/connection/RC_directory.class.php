@@ -189,7 +189,7 @@ trait RC_directory {
         $que_result = $this->genQuery(
                 array("COL_COLL_NAME", "COL_COLL_ID", "COL_COLL_OWNER_NAME",
             "COL_COLL_OWNER_ZONE", "COL_COLL_CREATE_TIME", "COL_COLL_MODIFY_TIME",
-            "COL_COLL_COMMENTS"), $cond, array(), 0, 1, false);
+            "COL_COLL_TYPE", "COL_COLL_INFO1", "COL_COLL_INFO2", "COL_COLL_COMMENTS"), $cond, array(), 0, 1, false);
         if ($que_result === false)
             return false;
 
