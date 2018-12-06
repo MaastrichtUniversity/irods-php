@@ -35,6 +35,7 @@ class RODSConnManager
     {
         $manager = $GLOBALS['RODSConnManager'];
 
+        $connname = "RODSConn" . ucfirst($account->auth_type);
         $conn = getRODSConn($account);
         $conn_sig = $conn->getSignature();
         if (!isset($manager->conn_map[$conn_sig]))
@@ -45,12 +46,15 @@ class RODSConnManager
             if ($opened_conn->isIdle()) {
                 //$opened_conn->lock();
                 $account = $opened_conn->getAccount(); //update account if needed...
+                debug(10, "Return idle existing connection for $connname instance for account proxyuser ",
+                      $account->proxy_user, " zone ", $account->zone);
                 return $opened_conn;
             }
         }
 
         //check if there is any more new connection allowed
         if (count($manager->conn_map[$conn_sig]) < MAX_NUM_CONN_PER_USER_SERVER) {
+            debug(10, "New connection for $connname instance for account ", $account);
             $conn->connect();
             $id = count($manager->conn_map[$conn_sig]);
             $manager->conn_map[$conn_sig][$id] = $conn;

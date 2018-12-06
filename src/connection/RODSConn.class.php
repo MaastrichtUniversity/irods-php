@@ -13,7 +13,6 @@ require_once("RC_auth_openid.class.php");
 function getRodsConn(RODSAccount $account) {
     $connname = "RODSConn" . ucfirst($account->auth_type);
     $conn = new $connname($account);
-    debug(5, "Created $connname instance for account ", $account);
     return $conn;
 }
 
