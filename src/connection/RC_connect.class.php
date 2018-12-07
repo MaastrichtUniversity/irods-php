@@ -205,6 +205,7 @@ trait RC_connect {
         $user = $this->account->user;
         $proxy_user = $this->account->proxy_user;
         $zone = $this->account->zone;
+        debug(5, "initConnection user $user proxy user $proxy_user zone $zone");
 
         $relVersion = RODS_REL_VERSION;
         $apiVersion = RODS_API_VERSION;
@@ -239,6 +240,7 @@ trait RC_connect {
 
     public function connect() {
 
+        debug(5, "connect");
         $this->makeConnection();
 
         $this->initConnection();
@@ -259,6 +261,7 @@ trait RC_connect {
      * Close the connection (socket)
      */
     public function disconnect($force = false, $message = true) {
+        debug(5, "disconnect");
         if (($this->connected === false) && ($force !== true))
             return;
 
