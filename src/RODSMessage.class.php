@@ -6,7 +6,8 @@ $GLOBALS['RODSMessage_types'] = array(
     "RODS_API_REQ_T" => "RODS_API_REQ",
     "RODS_DISCONNECT_T" => "RODS_DISCONNECT",
     "RODS_REAUTH_T" => "RODS_REAUTH",
-    "RODS_API_REPLY_T" => "RODS_API_REPLY"
+    "RODS_API_REPLY_T" => "RODS_API_REPLY",
+    "RODS_CS_NEG_T" => "RODS_CS_NEG_T",
 );
 
 class RODSMessage
@@ -49,14 +50,22 @@ class RODSMessage
         $this->errstr = $errstr;
     }
 
+    public function setHeader($type, $msg_len, $err_len, $bin_len, $intinfo) {
+        $this->header = new RP_MsgHeader($type, $msg_len, $err_len, $bin_len, $intinfo);
+    }
+
     public function pack()
     {
         if (isset($this->msg))
             $this->msg_xml = $this->msg->toXML();
 
-        $this->header = new RP_MsgHeader($this->typestr, strlen($this->msg_xml),
-            strlen($this->errstr), strlen($this->binstr), $this->intinfo);
+        if (is_null($this->header)) {
+            $this->setHeader($this->typestr, strlen($this->msg_xml),
+                             strlen($this->errstr), strlen($this->binstr), $this->intinfo);
+        }
+
         $header_xml = $this->header->toXML();
+        debug(12, "RODSMessage pack xml header ", $header_xml, "\n  message ", $this->msg_xml);
         $this->serialized = pack("N", strlen($header_xml)) . $header_xml .
             $this->msg_xml;
         return $this->serialized;
@@ -85,6 +94,7 @@ class RODSMessage
         // get main msg string
         $msg_len = $this->header->msgLen;
         $this->msg_xml = stream_get_contents($conn, $msg_len);
+        debug(12, "RODSMessage unpack xml header $this->header_xml\n   message $this->msg_xml");
         if ($msg_len != strlen($this->msg_xml)) {
             throw new RODSException("RODSMessage::unpack failed.2! " .
                     "The body length is unexpected: " . strlen($this->msg_xml) .
@@ -171,11 +181,9 @@ class RODSMessage
         return $this->header_xml . "\n" . $this->msg_xml;
     }
 
-    public static function packConnectMsg($user, $proxy_user, $zone, $relVersion = RODS_REL_VERSION,
-                                          $apiVersion = RODS_API_VERSION, $option = NULL)
+    public function getHeaderType()
     {
-        $msgbody = new RP_StartupPack($user, $proxy_user, $zone, $relVersion, $apiVersion . $option);
-        $rods_msg = new RODSMessage("RODS_CONNECT_T", $msgbody);
-        return $rods_msg->pack();
+        return $GLOBALS['RODSMessage_types'][$this->header->type];
     }
+
 }

@@ -9,6 +9,7 @@
 define("MAX_NUM_CONN_PER_USER_SERVER", 5);
 /**#@-*/
 
+require_once('connection/RODSConn.class.php');
 
 if (!isset($GLOBALS['RODSConnManager']))
     $GLOBALS['RODSConnManager'] = new RODSConnManager();
@@ -34,7 +35,8 @@ class RODSConnManager
     {
         $manager = $GLOBALS['RODSConnManager'];
 
-        $conn = new RODSConn($account);
+        $connname = "RODSConn" . ucfirst($account->auth_type);
+        $conn = getRODSConn($account);
         $conn_sig = $conn->getSignature();
         if (!isset($manager->conn_map[$conn_sig]))
             $manager->conn_map[$conn_sig] = array();
@@ -44,12 +46,15 @@ class RODSConnManager
             if ($opened_conn->isIdle()) {
                 //$opened_conn->lock();
                 $account = $opened_conn->getAccount(); //update account if needed...
+                debug(10, "Return idle existing connection for $connname instance for account proxyuser ",
+                      $account->proxy_user, " zone ", $account->zone);
                 return $opened_conn;
             }
         }
 
         //check if there is any more new connection allowed
         if (count($manager->conn_map[$conn_sig]) < MAX_NUM_CONN_PER_USER_SERVER) {
+            debug(10, "New connection for $connname instance for account ", $account);
             $conn->connect();
             $id = count($manager->conn_map[$conn_sig]);
             $manager->conn_map[$conn_sig][$id] = $conn;
@@ -59,12 +64,12 @@ class RODSConnManager
             return $conn;
         }
 
-        //because PHP doesn't support multithread, if we run out of connections,
-        //there is probably something went wrong.
+        // because PHP doesn't support multithread, if we run out of connections,
+        // there is probably something went wrong.
         throw new RODSException("Unexpectedly ran out of connections. Maybe some connections are not released??? ",
             "PERR_INTERNAL_ERR");
 
-        //if no connection are available, sleep for 100ms and retry
+        // if no connection are available, sleep for 100ms and retry
         usleep(100);
         echo "i am sleeping... <br/> \n";
         return RODSConnManager::getConn($account);

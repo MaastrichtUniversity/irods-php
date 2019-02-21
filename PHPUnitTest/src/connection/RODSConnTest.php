@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../../prods/src/RODSConn.class.php';
+require_once dirname(__FILE__) . '/../../../src/connection/RODSConn.class.php';
 
 /**
  * Test class for RODSConn.

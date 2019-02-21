@@ -12,11 +12,8 @@ class RODSDirStats
 
     // Stats related to special collections
     // https://github.com/irods/irods-legacy/blob/master/iRODS/doc/specialCollection
-    public $type;
-    public $info1;
-    public $info2;
 
-    public function __construct($name, $owner, $ownerzone, $mtime, $ctime, $id, $comments, $type, $info1, $info2)
+    public function __construct($name, $owner, $ownerzone, $mtime, $ctime, $id, $comments)
     {
         $this->name = $name;
         $this->owner = $owner;
@@ -25,10 +22,7 @@ class RODSDirStats
         $this->ctime = $ctime;
         $this->id = $id;
         $this->comments = $comments;
-        $this->type = $type;
-        $this->info1 = $info1;
-        $this->info2 = $info2;
     }
 
-}  
-     
+}
+

@@ -28,11 +28,9 @@ $lines = explode("\n", file_get_contents($capi_error_table_file));
 
 foreach ($lines as $line) {
     if (strlen($line) < 8) continue;
-    if (substr($line, 0, 7) == '#define') {
-        $rest = trim(substr($line, 7));
-
-        preg_match("/([A-Z_]+)\s+([-0-9]+)/", $rest, $tokens);
-
+    if (substr($line, 0, 10) == 'NEW_ERROR(') {
+        $rest = trim(substr($line, 10, -1));
+        preg_match("/([A-Z_]+),\s+([-0-9]+)/", $rest, $tokens);
         if (count($tokens) != 3)
             continue;
 

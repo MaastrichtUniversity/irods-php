@@ -9,9 +9,9 @@
  *
  * @author lisa
  */
-require_once dirname(__FILE__) . '/../../../prods/src/ProdsPath.class.php';
-require_once dirname(__FILE__) . '/../../../prods/src/ProdsDir.class.php';
-require_once dirname(__FILE__) . '/../../../prods/src/RODSAccount.class.php';
+require_once dirname(__FILE__) . '/../../src/ProdsPath.class.php';
+require_once dirname(__FILE__) . '/../../src/ProdsDir.class.php';
+require_once dirname(__FILE__) . '/../../src/RODSAccount.class.php';
 
 class stubProdsDir extends ProdsDir {
 

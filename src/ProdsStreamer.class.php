@@ -30,7 +30,6 @@ class ProdsStreamer
 	 */
 	private $file;
 
-	
 	/**
 	 * url_stat() handler.
 	 *

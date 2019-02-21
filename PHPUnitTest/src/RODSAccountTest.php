@@ -1,12 +1,12 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../../prods/src/RODSAccount.class.php';
-require_once dirname(__FILE__) . '/../../../prods/src/RODSConn.class.php';
-require_once dirname(__FILE__) . '/../../../prods/src/RODSConnManager.class.php';
-require_once dirname(__FILE__) . '/../../../prods/src/ProdsPath.class.php';
-require_once dirname(__FILE__) . '/../../../prods/src/ProdsDir.class.php';
-require_once dirname(__FILE__) . '/../../../prods/src/RODSException.class.php';
-require_once dirname(__FILE__) . '/../../../prods/src/RODSDirStats.class.php';
+require_once dirname(__FILE__) . '/../../src/RODSAccount.class.php';
+require_once dirname(__FILE__) . '/../../src/connection/RODSConn.class.php';
+require_once dirname(__FILE__) . '/../../src/RODSConnManager.class.php';
+require_once dirname(__FILE__) . '/../../src/ProdsPath.class.php';
+require_once dirname(__FILE__) . '/../../src/ProdsDir.class.php';
+require_once dirname(__FILE__) . '/../../src/RODSException.class.php';
+require_once dirname(__FILE__) . '/../../src/RODSDirStats.class.php';
 require_once dirname(__FILE__) . '/stubProdsDir.class.php';
 
 /**
